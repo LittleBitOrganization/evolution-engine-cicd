@@ -1,0 +1,11 @@
+{
+  "name": "com.littlebitgames.cicd",
+  "displayName": "CI/CD module",
+  "version": "1.0.0",
+  "unity": "2021.1",
+  "unityRelease": "6f1",
+  "category": "Module",
+  "author": {
+    "name": "LittleBitGames"
+  }
+}

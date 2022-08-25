@@ -1,0 +1,72 @@
+workflows:
+  unity-android-workflow:
+    name: Unity Android Workflow
+    max_build_duration: 120
+      # instance_type: mac_pro
+    environment:
+        android_signing:
+          - gardenevolution
+        groups:
+          - unity # <-- (Includes UNITY_HOME, UNITY_SERIAL, UNITY_USERNAME and UNITY_PASSWORD)
+          - google_play_credentials
+        vars:
+          UNITY_BIN: $UNITY_HOME/Contents/MacOS/Unity
+          UNITY_VERSION: 2021.3.1f1
+          UNITY_VERSION_CHANGESET: 3b70a0754835
+          UNITY_VERSION_BIN: /Applications/Unity/Hub/Editor/${UNITY_VERSION}/Unity.app/Contents/MacOS/Unity
+          BUILD_SCRIPT: BuildAndroid
+          CACHE_SERVER_IP: 159.253.19.129
+          CACHE_SERVER_PORT: 8126
+          BUILD_NAME: ${CM_COMMIT}
+          PACKAGE_NAME: "com.littlebit.idle.garden.evolution.empire.tycoon" # <-- Put your package name here e.g. com.littlebit.idle
+    triggering:
+      events:
+          - tag
+          - pull_request
+      branch_patterns:
+          - pattern: master
+            include: true
+            source: true
+          - pattern: develop
+            include: true
+            source: true
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - $CM_BUILD_DIR/Library
+        - /Applications/Unity/Hub/Editor/${UNITY_VERSION}
+    scripts:
+      - name: Activate Unity License
+        script: | 
+          $UNITY_BIN -batchmode -quit -logFile -serial ${UNITY_SERIAL?} -username ${UNITY_USERNAME?} -password ${UNITY_PASSWORD?}
+      - name: Install Unity version, buld support modules, ndk and jdk
+        script: | 
+          /Applications/Unity\ Hub.app/Contents/MacOS/Unity\ Hub -- --headless install --version ${UNITY_VERSION} --changeset ${UNITY_VERSION_CHANGESET}
+          /Applications/Unity\ Hub.app/Contents/MacOS/Unity\ Hub -- --headless install-modules --version ${UNITY_VERSION} -m android android-sdk-ndk-tools android-open-jdk
+      - name: Unity build
+        script: | 
+          export NEW_BUILD_NUMBER=$(($(google-play get-latest-build-number --tracks "alpha" --package-name "$PACKAGE_NAME") + 10))
+          $UNITY_VERSION_BIN -batchmode -projectPath . -executeMethod BuildScript.$BUILD_SCRIPT -nographics -buildTarget Android > $CM_BUILD_DIR/buildAndroid.log 2>&1
+    artifacts:
+        - android/*.aab
+        - android/*.apk
+        - buildAndroid.log
+    publishing:
+      scripts:
+        - name: Deactivate Unity License
+          script: $UNITY_BIN -batchmode -quit -returnlicense -nographics
+      email:
+        recipients:
+          - azot18@gmail.com
+          - themraction@gmail.com
+          - oleg.f@littlebit.games
+          - vlad.t@littlebit.games
+      slack:
+        channel: '#pipelines'
+        notify_on_build_start: true
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: alpha
+        in_app_update_priority: 3
+        changes_not_sent_for_review: true
+        submit_as_draft: true
