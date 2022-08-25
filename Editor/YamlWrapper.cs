@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor
+namespace LittleBit.Modules.CICD.Editor
 {
     public class YamlWrapper
     {
