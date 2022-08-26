@@ -38,7 +38,6 @@ namespace LittleBit.Modules.CICD.Editor
         public string CACHE_SERVER_IP { get; set; }
         public string CACHE_SERVER_PORT { get; set; }
         public string BUILD_NAME { get; set; }
-        public string BUILDPACKAGE_NAME_NAME { get; set; }
         public string PACKAGE_NAME { get; set; }
     }
 
