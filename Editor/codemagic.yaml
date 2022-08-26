@@ -5,14 +5,14 @@ workflows:
       # instance_type: mac_pro
     environment:
         android_signing:
-          - gardenevolution
+          - gardenevolution # <-- Put your signing from codemagic
         groups:
           - unity # <-- (Includes UNITY_HOME, UNITY_SERIAL, UNITY_USERNAME and UNITY_PASSWORD)
           - google_play_credentials
         vars:
           UNITY_BIN: $UNITY_HOME/Contents/MacOS/Unity
-          UNITY_VERSION: 2021.3.1f1
-          UNITY_VERSION_CHANGESET: 3b70a0754835
+          UNITY_VERSION: 2021.3.1f1 # <-- Put your unity version
+          UNITY_VERSION_CHANGESET: 3b70a0754835 # <-- Put your unity version changeset
           UNITY_VERSION_BIN: /Applications/Unity/Hub/Editor/${UNITY_VERSION}/Unity.app/Contents/MacOS/Unity
           BUILD_SCRIPT: BuildAndroid
           CACHE_SERVER_IP: 159.253.19.129
@@ -45,7 +45,7 @@ workflows:
           /Applications/Unity\ Hub.app/Contents/MacOS/Unity\ Hub -- --headless install-modules --version ${UNITY_VERSION} -m android android-sdk-ndk-tools android-open-jdk
       - name: Unity build
         script: | 
-          export NEW_BUILD_NUMBER=$(($(google-play get-latest-build-number --tracks "alpha" --package-name "$PACKAGE_NAME") + 10))
+          export NEW_BUILD_NUMBER=$(($(google-play get-latest-build-number --tracks "alpha" --package-name "$PACKAGE_NAME") + 1))
           $UNITY_VERSION_BIN -batchmode -projectPath . -executeMethod BuildScript.$BUILD_SCRIPT -nographics -buildTarget Android > $CM_BUILD_DIR/buildAndroid.log 2>&1
     artifacts:
         - android/*.aab
