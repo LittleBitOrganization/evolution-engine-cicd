@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using UnityEngine;
+using YamlDotNet.Serialization;
 
 namespace LittleBit.Modules.CICD.Editor
 {
@@ -15,12 +16,11 @@ namespace LittleBit.Modules.CICD.Editor
         {
             using (StreamReader reader = File.OpenText(FullPathToFile))
             {
-                string line = reader.ReadToEnd();
-
-                line = line.Split("\n").First(x => x.StartsWith("m_EditorVersionWithRevision:"))
-                    .Split(" ").First(x => x.StartsWith("(") && x.EndsWith(")")).Trim('(', ')');
-
-                return line;
+                var deserializer = new DeserializerBuilder()
+                    .Build();
+                var yamlObject = deserializer.Deserialize<YamlVersionModel>(new StreamReader(FullPathToFile));
+                
+                return yamlObject.m_EditorVersionWithRevision.Split(" ").First(x => x.StartsWith("(") && x.EndsWith(")")).Trim('(', ')');
             }
         }
     }
