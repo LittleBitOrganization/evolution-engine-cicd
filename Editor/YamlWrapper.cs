@@ -7,7 +7,9 @@ namespace LittleBit.Modules.CICD.Editor
     public class YamlWrapper
     {
         private const string YamlName = "codemagic.yaml";
-        
+        private const string ProjectSettingsFileName = "ProjectSettings.asset";
+        private static string PathToVersion => Path.Combine(new DirectoryInfo(Application.dataPath).Parent.FullName, "ProjectSettings");
+        private static string FullPathToProjectSettings => Path.Combine(PathToVersion, ProjectSettingsFileName);
         private static string GetPathToCopyYaml => Path.Combine(new DirectoryInfo(Application.dataPath).Parent.FullName, YamlName);
         private static string GetPathToOriginalYaml => Directory.GetFiles(Path.Combine(FindSourcePath()),"*.yaml")[0];
 
@@ -33,6 +35,17 @@ namespace LittleBit.Modules.CICD.Editor
         public static TextReader GetTextYaml()
         {
             return new StreamReader(GetPathToOriginalYaml);
+        }
+
+        public static TextReader GetProjectSettingYaml()
+        {
+            using (StreamWriter writer = new StreamWriter(FullPathToProjectSettings))  
+            {  
+                 
+                Debug.Log("<color=green> codemagic.yaml edited!</color>");
+            }
+            
+            return new StreamReader(FullPathToProjectSettings);
         }
         
         private static string FindSourcePath([CallerFilePath] string sourceFilePath = "")

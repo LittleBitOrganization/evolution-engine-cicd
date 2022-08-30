@@ -16,19 +16,18 @@ namespace LittleBit.Modules.CICD.Editor
         {
             var deserializer = new DeserializerBuilder()
                 .Build();
-            var yamlObject = deserializer.Deserialize<YamlCICD>(YamlWrapper.GetTextYaml());
-
-            yamlObject.workflows.unityAndroidWorkflow.environment.vars.PACKAGE_NAME =
-                "com." + Application.companyName + "." + Application.productName;
-            yamlObject.workflows.unityAndroidWorkflow.environment.android_signing = AndroidSigning;
-            yamlObject.workflows.unityAndroidWorkflow.environment.vars.UNITY_VERSION_CHANGESET =
+            var mainYamlObject = deserializer.Deserialize<YamlCICD>(YamlWrapper.GetTextYaml());
+                
+            mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.PACKAGE_NAME = Application.identifier;
+            mainYamlObject.workflows.unityAndroidWorkflow.environment.android_signing = AndroidSigning;
+            mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.UNITY_VERSION_CHANGESET =
                 UnityChangeset.GetUnityChangeset();
             
             if (AndroidSigning.Count > 0)
             {
                 var serializer = new SerializerBuilder()
                     .Build();
-                YamlWrapper.EditCopyYaml(serializer.Serialize(yamlObject));
+                YamlWrapper.EditCopyYaml(serializer.Serialize(mainYamlObject));
             }
             else
             {
