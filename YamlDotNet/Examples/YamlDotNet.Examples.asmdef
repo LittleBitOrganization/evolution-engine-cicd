@@ -1,9 +1,12 @@
 {
     "name": "YamlDotNet.Examples",
+    "rootNamespace": "",
     "references": [
         "YamlDotNet"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,

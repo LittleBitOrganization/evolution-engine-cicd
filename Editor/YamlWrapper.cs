@@ -40,9 +40,8 @@ namespace LittleBit.Modules.CICD.Editor
         public static TextReader GetProjectSettingYaml()
         {
             using (StreamWriter writer = new StreamWriter(FullPathToProjectSettings))  
-            {  
-                 
-                Debug.Log("<color=green> codemagic.yaml edited!</color>");
+            {
+                Debug.Log("<color=green>codemagic.yaml edited!</color>");
             }
             
             return new StreamReader(FullPathToProjectSettings);
