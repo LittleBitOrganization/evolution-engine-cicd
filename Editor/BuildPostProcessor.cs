@@ -26,13 +26,12 @@ public class BuildPostProcessor : MonoBehaviour
 
     private static void BuildAndroid(string path = "")
     {
-        Debug.Log("TenjinSDK: Starting Android Build");
+        
     }
 
     private static void BuildiOS(string path = "")
     {
 #if UNITY_IOS
-        Debug.Log("TenjinSDK: Starting iOS Build");
 
         string projectPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
         PBXProject project = new PBXProject();
@@ -54,11 +53,11 @@ public class BuildPostProcessor : MonoBehaviour
 
         foreach (string framework in frameworks)
         {
-            Debug.Log("TenjinSDK: Adding framework: " + framework);
+            Debug.Log("Adding framework: " + framework);
             project.AddFrameworkToProject(buildTarget, framework, true);
         }
 
-        Debug.Log("TenjinSDK: Adding -ObjC flag to other linker flags (OTHER_LDFLAGS)");
+        Debug.Log("Adding -ObjC flag to other linker flags (OTHER_LDFLAGS)");
         project.AddBuildProperty(buildTarget, "OTHER_LDFLAGS", "-ObjC");
 
         File.WriteAllText(projectPath, project.WriteToString());
