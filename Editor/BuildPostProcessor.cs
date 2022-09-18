@@ -32,16 +32,12 @@ public class BuildPostProcessor : MonoBehaviour
     private static void BuildiOS(string path = "")
     {
 #if UNITY_IOS
-
         string projectPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
         PBXProject project = new PBXProject();
         project.ReadFromFile(projectPath);
 
-#if UNITY_2019_3_OR_NEWER
-        string buildTarget = project.GetUnityFrameworkTargetGuid();
-#else
-    string buildTarget = project.TargetGuidByName("Unity-iPhone");
-#endif
+        string buildTargetMain = project.GetUnityMainTargetGuid();
+        string buildTargetUnityFramework = project.GetUnityFrameworkTargetGuid();
 
         List<string> frameworks = new List<string>();
 
@@ -49,16 +45,20 @@ public class BuildPostProcessor : MonoBehaviour
         frameworks.Add("AdSupport.framework");
         frameworks.Add("AppTrackingTransparency.framework");
         frameworks.Add("iAd.framework");
-        frameworks.Add("StoreKit.framework");
+        frameworks.Add("UnityFramework.framework");
+        frameworks.Add("Security.framework");
+        frameworks.Add("SystemConfiguration.framework");
+        frameworks.Add("libz.dylib");
 
         foreach (string framework in frameworks)
         {
             Debug.Log("Adding framework: " + framework);
-            project.AddFrameworkToProject(buildTarget, framework, true);
+            project.AddFrameworkToProject(buildTargetMain, framework, true);
         }
 
-        Debug.Log("Adding -ObjC flag to other linker flags (OTHER_LDFLAGS)");
-        project.AddBuildProperty(buildTarget, "OTHER_LDFLAGS", "-ObjC");
+        project.AddBuildProperty(buildTargetMain, "OTHER_LDFLAGS", "-ObjC");
+        project.SetBuildProperty(buildTargetMain, "ENABLE_BITCODE", "NO");
+        project.SetBuildProperty(buildTargetMain, "ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES", "YES");
 
         File.WriteAllText(projectPath, project.WriteToString());
 #endif  
@@ -71,7 +71,6 @@ public class BuildPostProcessor : MonoBehaviour
         if (target != BuildTarget.iOS)
             return;
 
-
         string plistPath = path + "/Info.plist";
         PlistDocument plist = new PlistDocument();
         plist.ReadFromFile(plistPath);
@@ -80,8 +79,8 @@ public class BuildPostProcessor : MonoBehaviour
 
         // Add ITSAppUsesNonExemptEncryption to Info.plist
         rootDict.SetString("ITSAppUsesNonExemptEncryption", "false");
-
-
+        rootDict.SetString("NSUserTrackingUsageDescription", "For analytics");
+        
         File.WriteAllText(plistPath, plist.WriteToString());
     }
 #endif
