@@ -59,6 +59,8 @@ public class BuildPostProcessor : MonoBehaviour
         project.AddBuildProperty(buildTargetMain, "OTHER_LDFLAGS", "-ObjC");
         project.SetBuildProperty(buildTargetMain, "ENABLE_BITCODE", "NO");
         project.SetBuildProperty(buildTargetMain, "ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES", "YES");
+        project.SetBuildProperty(buildTargetUnityFramework, "ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES", "NO");
+        project.SetBuildProperty(buildTargetUnityFramework, "ENABLE_BITCODE", "NO");
 
         File.WriteAllText(projectPath, project.WriteToString());
 #endif  
