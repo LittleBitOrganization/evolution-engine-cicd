@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 public class BuildPostProcessor : MonoBehaviour
 {
-    [PostProcessBuild]
+    [PostProcessBuild(998)]
     public static void OnPostprocessBuild(BuildTarget buildTarget, string path)
     {
         if (buildTarget == BuildTarget.iOS)
@@ -38,6 +38,9 @@ public class BuildPostProcessor : MonoBehaviour
 
         string buildTargetMain = project.GetUnityMainTargetGuid();
         string buildTargetUnityFramework = project.GetUnityFrameworkTargetGuid();
+
+        project.AddCapability (buildTargetMain, PBXCapabilityType.InAppPurchase);
+        project.AddCapability (buildTargetMain, PBXCapabilityType.PushNotifications);
 
         List<string> frameworks = new List<string>();
 
@@ -67,7 +70,7 @@ public class BuildPostProcessor : MonoBehaviour
     }
 
 #if UNITY_IOS
-    [PostProcessBuild(1)]
+    [PostProcessBuild(999)]
     public static void EditPlist(BuildTarget target, string path)
     {
         if (target != BuildTarget.iOS)
