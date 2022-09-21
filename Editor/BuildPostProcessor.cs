@@ -38,10 +38,7 @@ public class BuildPostProcessor : MonoBehaviour
 
         string buildTargetMain = project.GetUnityMainTargetGuid();
         string buildTargetUnityFramework = project.GetUnityFrameworkTargetGuid();
-
-        project.AddCapability (buildTargetMain, PBXCapabilityType.InAppPurchase);
-        project.AddCapability (buildTargetMain, PBXCapabilityType.PushNotifications);
-
+        
         List<string> frameworks = new List<string>();
 
         frameworks.Add("AdServices.framework");
@@ -70,6 +67,7 @@ public class BuildPostProcessor : MonoBehaviour
     }
 
 #if UNITY_IOS
+
     [PostProcessBuild(999)]
     public static void EditPlist(BuildTarget target, string path)
     {
@@ -88,5 +86,6 @@ public class BuildPostProcessor : MonoBehaviour
         
         File.WriteAllText(plistPath, plist.WriteToString());
     }
+
 #endif
 }
