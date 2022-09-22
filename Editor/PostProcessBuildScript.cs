@@ -1,14 +1,12 @@
 using System.IO;
-using JetBrains.Annotations;
 using UnityEditor;
-using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
 using UnityEngine;
 public class PostProcessBuildScript : ScriptableObject
 {
     public DefaultAsset entitlementsFile;
-    [PostProcessBuild, UsedImplicitly]
-    public static void ChangesToXcode(BuildTarget buildTarget, string pathToBuiltProject)
+    
+    public static void ChangesToXcode(string pathToBuiltProject)
     {
         // Get project PBX file
         var projPath = PBXProject.GetPBXProjectPath(pathToBuiltProject);

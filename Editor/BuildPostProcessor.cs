@@ -38,6 +38,8 @@ public class BuildPostProcessor : MonoBehaviour
 
         string buildTargetMain = project.GetUnityMainTargetGuid();
         string buildTargetUnityFramework = project.GetUnityFrameworkTargetGuid();
+
+        PostProcessBuildScript.ChangesToXcode(path);
         
         List<string> frameworks = new List<string>();
 
