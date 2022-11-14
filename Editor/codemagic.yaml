@@ -2,13 +2,14 @@ workflows:
   unity-android-workflow:
     name: Unity Android Workflow
     max_build_duration: 120
-      # instance_type: mac_pro
+    instance_type: mac_pro
     environment:
         android_signing:
           - gardenevolution # <-- Put your signing from codemagic
         groups:
           - unity # <-- (Includes UNITY_HOME, UNITY_SERIAL, UNITY_USERNAME and UNITY_PASSWORD)
           - google_play_credentials
+          - SSH
         vars:
           UNITY_BIN: $UNITY_HOME/Contents/MacOS/Unity
           UNITY_VERSION: 2021.3.1f1 # <-- Put your unity version
@@ -57,8 +58,6 @@ workflows:
           script: $UNITY_BIN -batchmode -quit -returnlicense -nographics
       email:
         recipients:
-          - azot18@gmail.com
-          - themraction@gmail.com
           - oleg.f@littlebit.games
           - vlad.t@littlebit.games
       slack:
