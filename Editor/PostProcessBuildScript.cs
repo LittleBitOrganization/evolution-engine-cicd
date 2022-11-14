@@ -1,6 +1,8 @@
 using System.IO;
 using UnityEditor;
+#if UNITY_IOS 
 using UnityEditor.iOS.Xcode;
+#endif
 using UnityEngine;
 public class PostProcessBuildScript : ScriptableObject
 {

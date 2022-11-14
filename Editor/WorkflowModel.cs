@@ -13,6 +13,7 @@ namespace LittleBit.Modules.CICD.Editor
     {
         public string name { get; set; }
         public string max_build_duration { get; set; }
+        public string instance_type { get; set; }
         public Environment environment { get; set; }
         public Triggering triggering { get; set; }
         public Cache cache { get; set; }
@@ -83,7 +84,7 @@ namespace LittleBit.Modules.CICD.Editor
         public string channel { get; set; }
         public string notify_on_build_start { get; set; }
     }
-
+    
     public class GooglePlay
     {
         public string credentials { get; set; }
@@ -92,5 +93,4 @@ namespace LittleBit.Modules.CICD.Editor
         public string changes_not_sent_for_review { get; set; }
         public string submit_as_draft { get; set; }
     }
-
 }
