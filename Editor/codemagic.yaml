@@ -54,8 +54,9 @@ workflows:
         - buildAndroid.log
     publishing:
       scripts:
-        - name: Deactivate Unity License
-          script: $UNITY_BIN -batchmode -quit -returnlicense -nographics
+      - name: Deactivate Unity License
+        script: | 
+          /Applications/Unity\ Hub.app/Contents/Frameworks/UnityLicensingClient_V1.app/Contents/MacOS/Unity.Licensing.Client --return-ulf --username ${UNITY_EMAIL?} --password ${UNITY_PASSWORD?}
       email:
         recipients:
           - oleg.f@littlebit.games

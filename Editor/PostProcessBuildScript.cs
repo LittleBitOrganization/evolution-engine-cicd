@@ -10,6 +10,7 @@ public class PostProcessBuildScript : ScriptableObject
     
     public static void ChangesToXcode(string pathToBuiltProject)
     {
+#if UNITY_IOS 
         // Get project PBX file
         var projPath = PBXProject.GetPBXProjectPath(pathToBuiltProject);
         var proj = new PBXProject();
@@ -35,5 +36,6 @@ public class PostProcessBuildScript : ScriptableObject
         }
         // Save the changed configs to the file
         File.WriteAllText(projPath, proj.WriteToString());
+#endif
     }
 }
