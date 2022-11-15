@@ -1,5 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace LittleBit.Modules.CICD.Editor
@@ -20,17 +25,81 @@ namespace LittleBit.Modules.CICD.Editor
                 File.Copy(GetPathToOriginalYaml, GetPathToCopyYaml);
                 Debug.Log("<color=green> codemagic.yaml created at</color>\n" + Path.Combine(FindSourcePath(), "codemagic.yaml") );
             }
+            else
+            {
+                File.Delete(GetPathToCopyYaml);
+                File.Copy(GetPathToOriginalYaml, GetPathToCopyYaml);
+                Debug.Log("<color=green> codemagic.yaml created at</color>\n" + Path.Combine(FindSourcePath(), "codemagic.yaml") );
+
+            }
         }
 
-        public static void EditCopyYaml(string textWriter)
+        public static void EditCopyYaml(string textWriter, List<string> objToRemove)
         {
             CopyYAMLtoRootDir();
-            using (StreamWriter writer = new StreamWriter(GetPathToCopyYaml))  
-            {  
-                writer.Write(textWriter); 
+            
+            var lines = textWriter.Split("\n");
+            int countTab = 0;
+            List<int> skipLines = new ();
+            
+            using (StreamWriter writer = new StreamWriter(GetPathToCopyYaml))
+            {
+                Debug.LogError(objToRemove.Count );
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (objToRemove.Any(remove => lines[i].Contains(remove)))
+                    {
+                        skipLines.Add(i);
+                        for (int j = 0; j < lines[i].Length; j++)
+                        {
+                            if (lines[i][j] == ' ')
+                            {
+                                countTab++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        for (int j = i+1; j < lines.Length; j++)
+                        {
+                            int tab = 0;
+                            for (int k = 0; k < lines[j].Length; k++)
+                            {
+                                if (lines[j][k] == ' ')
+                                {
+                                    tab++;
+                                }
+                            }
+                            Debug.LogError(lines[j] + "  "  + countTab + "   " + tab);
+                            if (tab - 3 == countTab)
+                            {
+                                skipLines.Add(j);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    bool notSkip = true;
+                    foreach (var skip in skipLines.Where(skip => skip == i))
+                    {
+                        notSkip = false;
+                    }
+                    if(notSkip)
+                        writer.WriteLine(lines[i]);
+                }
+                
                 Debug.Log("<color=green> codemagic.yaml edited!</color>");
             }
         }
+        
         
         public static TextReader GetTextYaml()
         {

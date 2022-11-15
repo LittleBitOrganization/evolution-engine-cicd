@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NaughtyAttributes;
 using Unity.VisualScripting.YamlDotNet.Serialization;
 using UnityEngine;
@@ -11,27 +13,114 @@ namespace LittleBit.Modules.CICD.Editor
         [ResizableTextArea][ReadOnly] public string description = "AndroidSigning взять из Codemagic.io";
         [field: SerializeField] public List<string> AndroidSigning { get; private set; }
 
+        [Dropdown("_instanceTypes")] public InstancesType enumInstance;
+        [Dropdown("_isPublishingInGoogle")] public bool publishingInGoogle;
+        private DropdownList<InstancesType> _instanceTypes()
+        {
+            return new DropdownList<InstancesType>()
+            {
+                { "Mac PRO", InstancesType.MacPro},
+                { "Mac M1", InstancesType.MacM1},
+                { "Mac Intel", InstancesType.MacIntel},
+            };
+        }
+        
+        private DropdownList<bool> _isPublishingInGoogle()
+        {
+            return new DropdownList<bool>()
+            {
+                { "true", true},
+                { "false", false},
+            };
+        }
+
+        public enum InstancesType
+        {
+            MacPro,
+            MacM1,
+            MacIntel
+        }
+
+        private YamlCICD _mainYamlObject;
+        private List<string> _removeObj;
         [Button()]
         public void EditYamlFile()
         {
+            _removeObj = new();
             var deserializer = new DeserializerBuilder()
                 .Build();
-            var mainYamlObject = deserializer.Deserialize<YamlCICD>(YamlWrapper.GetTextYaml());
-                
-            mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.PACKAGE_NAME = Application.identifier;
-            mainYamlObject.workflows.unityAndroidWorkflow.environment.android_signing = AndroidSigning;
-            mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.UNITY_VERSION_CHANGESET =
+            _mainYamlObject = deserializer.Deserialize<YamlCICD>(YamlWrapper.GetTextYaml());
+
+            SetDeactivateLicenseScriptToM1OrIntel();
+            
+            switch (enumInstance)
+            {
+                case InstancesType.MacPro:
+                    _mainYamlObject.workflows.unityAndroidWorkflow.instance_type = "mac_pro";
+                    break;
+                case InstancesType.MacM1:
+                    _mainYamlObject.workflows.unityAndroidWorkflow.instance_type = "mac_mini_m1";
+                    break;
+                case InstancesType.MacIntel:
+                    _mainYamlObject.workflows.unityAndroidWorkflow.instance_type = "mac_mini";
+                    
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            SetGooglePublishing(publishingInGoogle);
+            
+            _mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.PACKAGE_NAME = Application.identifier;
+            _mainYamlObject.workflows.unityAndroidWorkflow.environment.android_signing = AndroidSigning;
+            _mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.UNITY_VERSION_CHANGESET =
                 UnityChangeset.GetUnityChangeset();
             
             if (AndroidSigning.Count > 0)
             {
                 var serializer = new SerializerBuilder()
                     .Build();
-                YamlWrapper.EditCopyYaml(serializer.Serialize(mainYamlObject));
+                foreach (var VARIABLE in _removeObj)
+                {
+                    Debug.Log(VARIABLE);
+                }
+
+                YamlWrapper.EditCopyYaml(serializer.Serialize(_mainYamlObject), _removeObj);
             }
             else
             {
                 Debug.LogError("AndroidSigning EMPTY!!!");
+            }
+        }
+
+        private void SetGooglePublishing(bool b)
+        {
+            Debug.LogError(b);
+            if (b)
+            {
+                foreach (var scripts in _mainYamlObject.workflows.unityAndroidWorkflow.scripts.Where(scripts => scripts.name.Contains("Unity build")))
+                {
+                    scripts.script = "export NEW_BUILD_NUMBER=$(($(google-play get-latest-build-number --tracks \"alpha\" --package-name \"$PACKAGE_NAME\") + 1))\n$UNITY_VERSION_BIN -batchmode -projectPath . -executeMethod BuildScript.$BUILD_SCRIPT -nographics -buildTarget Android > $CM_BUILD_DIR/buildAndroid.log 2>&1"; 
+                }
+            }
+            else
+            {
+                _removeObj.Add("google_play:");
+                foreach (var scripts in _mainYamlObject.workflows.unityAndroidWorkflow.scripts.Where(scripts => scripts.name.Contains("Unity build")))
+                {
+                    scripts.script = "$UNITY_VERSION_BIN -batchmode -projectPath . -executeMethod BuildScript.$BUILD_SCRIPT -nographics -buildTarget Android > $CM_BUILD_DIR/buildAndroid.log 2>&1";
+                }
+            }
+            
+        }
+
+        private void SetDeactivateLicenseScriptToM1OrIntel()
+        {
+            foreach (var scripts in _mainYamlObject.workflows.unityAndroidWorkflow.publishing.scripts.Where(scripts => scripts.name.Contains("Deactivate Unity License")))
+            {
+                scripts.script = enumInstance is InstancesType.MacM1 or InstancesType.MacPro ? 
+                    "/Applications/Unity\\ Hub.app/Contents/Frameworks/UnityLicensingClient_V1.app/Contents/MacOS/Unity.Licensing.Client --return-ulf --username ${UNITY_EMAIL?} --password ${UNITY_PASSWORD?}" : 
+                    "$UNITY_BIN -batchmode -quit -returnlicense -nographics";
             }
         }
     }
