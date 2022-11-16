@@ -96,7 +96,7 @@ namespace LittleBit.Modules.CICD.Editor
             {
                 foreach (var scripts in _mainYamlObject.workflows.unityAndroidWorkflow.scripts.Where(scripts => scripts.name.Contains("Unity build")))
                 {
-                    scripts.script = "export NEW_BUILD_NUMBER=$(($(google-play get-latest-build-number --tracks \"alpha\" --package-name \"$PACKAGE_NAME\") + 1))\n$UNITY_VERSION_BIN -batchmode -projectPath . -executeMethod BuildScript.$BUILD_SCRIPT -nographics -buildTarget Android > $CM_BUILD_DIR/buildAndroid.log 2>&1\nbash ./setup-ssh-key.sh"; 
+                    scripts.script = "export NEW_BUILD_NUMBER=$(($(google-play get-latest-build-number --tracks \"alpha\" --package-name \"$PACKAGE_NAME\") + 1))\n$UNITY_VERSION_BIN -batchmode -projectPath . -executeMethod BuildScript.$BUILD_SCRIPT -nographics -buildTarget Android > $CM_BUILD_DIR/buildAndroid.log 2>&1"; 
                 }
             }
             else
@@ -104,7 +104,7 @@ namespace LittleBit.Modules.CICD.Editor
                 _removeObj.Add("google_play:");
                 foreach (var scripts in _mainYamlObject.workflows.unityAndroidWorkflow.scripts.Where(scripts => scripts.name.Contains("Unity build")))
                 {
-                    scripts.script = "$UNITY_VERSION_BIN -batchmode -projectPath . -executeMethod BuildScript.$BUILD_SCRIPT -nographics -buildTarget Android > $CM_BUILD_DIR/buildAndroid.log 2>&1\nbash ./setup-ssh-key.sh";
+                    scripts.script = "$UNITY_VERSION_BIN -batchmode -projectPath . -executeMethod BuildScript.$BUILD_SCRIPT -nographics -buildTarget Android > $CM_BUILD_DIR/buildAndroid.log 2>&1";
                 }
             }
             
