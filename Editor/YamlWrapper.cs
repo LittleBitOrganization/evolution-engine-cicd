@@ -12,11 +12,14 @@ namespace LittleBit.Modules.CICD.Editor
     public class YamlWrapper
     {
         private const string YamlName = "codemagic.yaml";
+        private const string SshName = "setup-ssh-key.sh";
         private const string ProjectSettingsFileName = "ProjectSettings.asset";
         private static string PathToVersion => Path.Combine(new DirectoryInfo(Application.dataPath).Parent.FullName, "ProjectSettings");
         private static string FullPathToProjectSettings => Path.Combine(PathToVersion, ProjectSettingsFileName);
         private static string GetPathToCopyYaml => Path.Combine(new DirectoryInfo(Application.dataPath).Parent.FullName, YamlName);
+        private static string GetPathToCopySsh => Path.Combine(new DirectoryInfo(Application.dataPath).Parent.FullName, SshName);
         private static string GetPathToOriginalYaml => Directory.GetFiles(Path.Combine(FindSourcePath()),"*.yaml")[0];
+        private static string GetPathToOriginalSh => Directory.GetFiles(Path.Combine(FindSourcePath()),"*.sh")[0];
 
         public static void CopyYAMLtoRootDir()
         {
@@ -44,8 +47,6 @@ namespace LittleBit.Modules.CICD.Editor
             
             using (StreamWriter writer = new StreamWriter(GetPathToCopyYaml))
             {
-                Debug.LogError(objToRemove.Count );
-
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (objToRemove.Any(remove => lines[i].Contains(remove)))
@@ -72,7 +73,7 @@ namespace LittleBit.Modules.CICD.Editor
                                     tab++;
                                 }
                             }
-                            Debug.LogError(lines[j] + "  "  + countTab + "   " + tab);
+                            
                             if (tab - 3 == countTab)
                             {
                                 skipLines.Add(j);
@@ -99,8 +100,22 @@ namespace LittleBit.Modules.CICD.Editor
                 Debug.Log("<color=green> codemagic.yaml edited!</color>");
             }
         }
-        
-        
+
+        public static void CopySSH()
+        {
+            if (!File.Exists(GetPathToOriginalYaml))
+            {
+                File.Copy(GetPathToOriginalSh, GetPathToCopySsh);
+                Debug.Log("<color=green> ssh.sh created at</color>\n" + Path.Combine(FindSourcePath(), "ssh.sh") );
+            }
+            else
+            {
+                File.Delete(GetPathToCopySsh);
+                File.Copy(GetPathToOriginalSh, GetPathToCopySsh);
+                Debug.Log("<color=red> ssh.sh deleted</color>\n");
+                Debug.Log("<color=green> ssh.sh created at</color>\n" + Path.Combine(FindSourcePath(), "ssh.sh") );
+            }
+        }
         public static TextReader GetTextYaml()
         {
             return new StreamReader(GetPathToOriginalYaml);
