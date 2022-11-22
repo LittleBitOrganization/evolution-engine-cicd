@@ -16,8 +16,6 @@ workflows:
           UNITY_VERSION_CHANGESET: 3b70a0754835 # <-- Put your unity version changeset
           UNITY_VERSION_BIN: /Applications/Unity/Hub/Editor/${UNITY_VERSION}/Unity.app/Contents/MacOS/Unity
           BUILD_SCRIPT: BuildAndroid
-          CACHE_SERVER_IP: 159.253.19.129
-          CACHE_SERVER_PORT: 8126
           BUILD_NAME: ${CM_COMMIT}
           PACKAGE_NAME: "com.littlebit.idle.garden.evolution.empire.tycoon" # <-- Put your package name here e.g. com.littlebit.idle
     triggering:
@@ -31,11 +29,6 @@ workflows:
           - pattern: develop
             include: true
             source: true
-    cache:
-      cache_paths:
-        - $HOME/.gradle/caches
-        - $CM_BUILD_DIR/Library
-        - /Applications/Unity/Hub/Editor/${UNITY_VERSION}
     scripts:
       - name: Activate Unity License
         script: | 
