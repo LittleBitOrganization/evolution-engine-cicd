@@ -36,8 +36,6 @@ namespace LittleBit.Modules.CICD.Editor
         public string UNITY_VERSION_CHANGESET { get; set; }
         public string UNITY_VERSION_BIN { get; set; }
         public string BUILD_SCRIPT { get; set; }
-        public string CACHE_SERVER_IP { get; set; }
-        public string CACHE_SERVER_PORT { get; set; }
         public string BUILD_NAME { get; set; }
         public string PACKAGE_NAME { get; set; }
     }
