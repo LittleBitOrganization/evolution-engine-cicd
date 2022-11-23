@@ -15,6 +15,7 @@ namespace LittleBit.Modules.CICD.Editor
 
         [Dropdown("_instanceTypes")] public InstancesType enumInstance;
         [Dropdown("_isPublishingInGoogle")] public bool publishingInGoogle;
+        [Dropdown("_unityVersions")] public UnityVersions unityVersions;
         private DropdownList<InstancesType> _instanceTypes()
         {
             return new DropdownList<InstancesType>()
@@ -40,7 +41,42 @@ namespace LittleBit.Modules.CICD.Editor
             MacM1,
             MacIntel
         }
+        
+        private DropdownList<UnityVersions> _unityVersions()
+        {
+            return new DropdownList<UnityVersions>
+            {
+                { "2023.1.0a19", new()
+                {
+                    UnityVersion = "2023.1.0a19",
+                    UnityChangeSet = "0c2ff406cf78"
+                }},
+                { "2021.3.1f1", new()
+                {
+                    UnityVersion = "2021.3.1f1",
+                    UnityChangeSet = "3b70a0754835"
+                }},
+                { "2022.1.23f1", new()
+                {
+                    UnityVersion = "2022.1.23f1",
+                    UnityChangeSet = "9636b062134a"
+                }},
+                { "2022.2.0b16", new()
+                {
+                    UnityVersion = "2022.2.0b16",
+                    UnityChangeSet = "3c3b3e6cd1d7"
+                }},
+            };
+        }
 
+        
+        [Serializable]
+        public struct UnityVersions
+        {
+            public string UnityVersion;
+            public string UnityChangeSet;
+        }
+        
         private YamlCICD _mainYamlObject;
         private List<string> _removeObj;
         [Button()]
@@ -73,8 +109,10 @@ namespace LittleBit.Modules.CICD.Editor
             
             _mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.PACKAGE_NAME = Application.identifier;
             _mainYamlObject.workflows.unityAndroidWorkflow.environment.android_signing = AndroidSigning;
-            _mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.UNITY_VERSION_CHANGESET =
-                UnityChangeset.GetUnityChangeset();
+            //_mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.UNITY_VERSION_CHANGESET = UnityChangeset.GetUnityChangeset();
+
+            _mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.UNITY_VERSION = unityVersions.UnityVersion;
+            _mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.UNITY_VERSION_CHANGESET = unityVersions.UnityChangeSet;
             
             if (AndroidSigning.Count > 0)
             {
