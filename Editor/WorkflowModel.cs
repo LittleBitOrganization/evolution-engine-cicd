@@ -16,7 +16,6 @@ namespace LittleBit.Modules.CICD.Editor
         public string instance_type { get; set; }
         public Environment environment { get; set; }
         public Triggering triggering { get; set; }
-        public Cache cache { get; set; }
         public List<Script> scripts { get; set; }
         public List<string> artifacts { get; set; }
         public Publishing publishing { get; set; }
