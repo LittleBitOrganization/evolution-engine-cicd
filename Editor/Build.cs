@@ -17,19 +17,19 @@ public static class BuildScript
     [MenuItem("Build/Build Android")]
     public static void BuildAndroid()
     {
-
-        string cacheServerIP = Environment.GetEnvironmentVariable("CACHE_SERVER_IP");
-        string cacheServerPort = Environment.GetEnvironmentVariable("CACHE_SERVER_PORT");
-
-        // Enable Cache Server
-        if(cacheServerIP.Length > 0 && cacheServerPort.Length > 0)
-        {
-            EditorPrefs.SetBool("CacheServerEnabled", true);
-            EditorPrefs.SetString("CacheServerIPAddress", cacheServerIP + ":" + cacheServerPort);
-        }
+        //
+        // string cacheServerIP = Environment.GetEnvironmentVariable("CACHE_SERVER_IP");
+        // string cacheServerPort = Environment.GetEnvironmentVariable("CACHE_SERVER_PORT");
+        //
+        // // Enable Cache Server
+        // if(cacheServerIP.Length > 0 && cacheServerPort.Length > 0)
+        // {
+        //     EditorPrefs.SetBool("CacheServerEnabled", true);
+        //     EditorPrefs.SetString("CacheServerIPAddress", cacheServerIP + ":" + cacheServerPort);
+        // }
 
         PlayerSettings.Android.useCustomKeystore = true;
-
+        PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
         // Set bundle version
         var versionIsSet = int.TryParse(Environment.GetEnvironmentVariable("NEW_BUILD_NUMBER"), out int parsedVersion);
         int version = 0;
@@ -40,7 +40,7 @@ public static class BuildScript
         else
         {
             int projectBuildNumber = int.Parse(Environment.GetEnvironmentVariable("PROJECT_BUILD_NUMBER"));
-            version = projectBuildNumber + 200;
+            version = projectBuildNumber + 1;
         }
 
         Debug.Log($"Bundle version code set to {version}");
