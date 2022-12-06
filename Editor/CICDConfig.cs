@@ -12,6 +12,7 @@ namespace LittleBit.Modules.CICD.Editor
     {
         [ResizableTextArea][ReadOnly] public string description = "AndroidSigning взять из Codemagic.io";
         [field: SerializeField] public List<string> AndroidSigning { get; private set; }
+        [field: SerializeField] private int timeoutMinutes = 60;
 
         [Dropdown("_instanceTypes")] public InstancesType enumInstance;
         [Dropdown("_isPublishingInGoogle")] public bool publishingInGoogle;
@@ -105,6 +106,8 @@ namespace LittleBit.Modules.CICD.Editor
                     throw new ArgumentOutOfRangeException();
             }
 
+            _mainYamlObject.workflows.unityAndroidWorkflow.max_build_duration = timeoutMinutes.ToString();
+            
             SetGooglePublishing(publishingInGoogle);
             
             _mainYamlObject.workflows.unityAndroidWorkflow.environment.vars.PACKAGE_NAME = Application.identifier;
